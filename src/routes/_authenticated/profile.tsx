@@ -5,13 +5,22 @@ import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firest
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 import { getDb, getFirebaseAuth } from "@/lib/firebase";
+import {
+  fetchWhatsAppTemplates,
+  saveWhatsAppTemplate,
+  updateDefaultTemplate,
+  deleteWhatsAppTemplate,
+  type WhatsAppTemplate,
+} from "@/lib/user-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   User as UserIcon, Mail, Phone, ShieldCheck, Sun, Moon,
   CheckCircle2, KeyRound, Loader2, Sparkles, MapPin, Trash2,
+  MessageCircle, Plus, Copy, Check, X,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/profile")({
@@ -29,6 +38,14 @@ function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [resetMsg, setResetMsg] = useState("");
   const [verifyMsg, setVerifyMsg] = useState("");
+  const [templates, setTemplates] = useState<WhatsAppTemplate[]>([]);
+  const [newTemplateName, setNewTemplateName] = useState("");
+  const [newTemplateContent, setNewTemplateContent] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [templateMsg, setTemplateMsg] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -41,6 +58,8 @@ function ProfilePage() {
           if (d.phone) setPhone(d.phone);
           if (d.signature) setSignature(d.signature);
         }
+        const tmpl = await fetchWhatsAppTemplates(user.uid);
+        setTemplates(tmpl);
       } catch {}
     })();
   }, [user]);
@@ -86,6 +105,62 @@ function ProfilePage() {
     try { localStorage.removeItem("leadfinder.seen.v1"); localStorage.removeItem("leadfinder.saved.v1"); } catch {}
     setSavedMsg("Local data cleared");
     setTimeout(() => setSavedMsg(""), 2200);
+  };
+
+  const handleSaveTemplate = async () => {
+    if (!user) return;
+    setSavingTemplate(true);
+    setTemplateMsg("");
+    try {
+      const template: WhatsAppTemplate = {
+        id: editingId || crypto.randomUUID(),
+        name: editName || "Untitled",
+        content: editContent,
+        isDefault: editingId ? templates.find((t) => t.id === editingId)?.isDefault ?? false : templates.length === 0,
+        createdAt: editingId ? templates.find((t) => t.id === editingId)?.createdAt ?? Date.now() : Date.now(),
+        updatedAt: Date.now(),
+      };
+      await saveWhatsAppTemplate(user.uid, template);
+      const updated = await fetchWhatsAppTemplates(user.uid);
+      setTemplates(updated);
+      setEditingId(null);
+      setEditName("");
+      setEditContent("");
+      setNewTemplateName("");
+      setNewTemplateContent("");
+      setTemplateMsg("Template saved");
+      setTimeout(() => setTemplateMsg(""), 2200);
+    } catch (e) {
+      setTemplateMsg("Could not save template");
+    } finally {
+      setSavingTemplate(false);
+    }
+  };
+
+  const handleSetDefault = async (id: string) => {
+    if (!user) return;
+    try {
+      await updateDefaultTemplate(user.uid, id);
+      const updated = await fetchWhatsAppTemplates(user.uid);
+      setTemplates(updated);
+      setTemplateMsg("Default template updated");
+      setTimeout(() => setTemplateMsg(""), 2200);
+    } catch {
+      setTemplateMsg("Could not update default");
+    }
+  };
+
+  const handleDeleteTemplate = async (id: string) => {
+    if (!user || !confirm("Delete this template?")) return;
+    try {
+      await deleteWhatsAppTemplate(user.uid, id);
+      const updated = await fetchWhatsAppTemplates(user.uid);
+      setTemplates(updated);
+      setTemplateMsg("Template deleted");
+      setTimeout(() => setTemplateMsg(""), 2200);
+    } catch {
+      setTemplateMsg("Could not delete template");
+    }
   };
 
   return (

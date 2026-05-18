@@ -6,11 +6,16 @@ import { searchLeads, type Lead, type SearchResult } from "@/lib/leads.functions
 import { useAuth } from "@/lib/auth-context";
 import {
   type SavedSearch,
+  type SearchHistory,
   fetchSavedSearches,
   loadSavedCache,
   persistCache,
   saveSavedSearch,
   updateSavedResult,
+  loadHistoryCache,
+  persistHistoryCache,
+  saveSearchHistory,
+  fetchSearchHistory,
 } from "@/lib/user-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,6 +107,7 @@ function SearchPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [seen, setSeen] = useState<Record<string, number>>({});
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
+  const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [seenSnapshot, setSeenSnapshot] = useState<Record<string, number>>({});
 
   // Hydrate from query param
@@ -118,7 +124,9 @@ function SearchPage() {
     setSeen(loadSeen());
     if (!user) return;
     setSavedSearches(loadSavedCache(user.uid));
+    setSearchHistory(loadHistoryCache(user.uid));
     fetchSavedSearches(user.uid).then(setSavedSearches).catch(() => {});
+    fetchSearchHistory(user.uid).then(setSearchHistory).catch(() => {});
   }, [user]);
 
   const mutation = useMutation<SearchResult, Error, void>({
@@ -130,6 +138,21 @@ function SearchPage() {
       saveSeen(next);
       setSeen(next);
       if (!user) return;
+      
+      // Auto-save to search history
+      const historyEntry: SearchHistory = {
+        id: crypto.randomUUID(),
+        location,
+        keyword,
+        radius,
+        searchedAt: Date.now(),
+        result: data && !data.error ? data : undefined,
+      };
+      const nextHistory = [historyEntry, ...searchHistory];
+      setSearchHistory(nextHistory);
+      persistHistoryCache(user.uid, nextHistory);
+      saveSearchHistory(user.uid, historyEntry).catch(() => {});
+      
       setSavedSearches((prev) => {
         const updated = prev.map((s) => {
           if (s.location === location && s.keyword === keyword && s.radius === radius) {

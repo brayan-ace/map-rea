@@ -3,8 +3,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import {
   type SavedSearch,
+  type SearchHistory,
   fetchSavedSearches,
   loadSavedCache,
+  loadHistoryCache,
+  fetchSearchHistory,
 } from "@/lib/user-data";
 import {
   Search,
@@ -35,23 +38,27 @@ function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [saved, setSaved] = useState<SavedSearch[]>([]);
+  const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [quickLocation, setQuickLocation] = useState("");
   const [quickKeyword, setQuickKeyword] = useState("");
 
   useEffect(() => {
     if (!user) return;
     setSaved(loadSavedCache(user.uid));
+    setSearchHistory(loadHistoryCache(user.uid));
     fetchSavedSearches(user.uid).then(setSaved).catch(() => {});
+    fetchSearchHistory(user.uid).then(setSearchHistory).catch(() => {});
   }, [user]);
 
   const stats = useMemo(() => {
-    const totalLeads = saved.reduce((sum, s) => sum + (s.result?.withoutWebsite ?? 0), 0);
-    const totalScanned = saved.reduce((sum, s) => sum + (s.result?.totalScanned ?? 0), 0);
-    const cities = new Set(saved.map((s) => s.location.split(",")[0].trim().toLowerCase())).size;
+    const allSearches = [...saved, ...searchHistory];
+    const totalLeads = allSearches.reduce((sum, s) => sum + (s.result?.withoutWebsite ?? 0), 0);
+    const totalScanned = allSearches.reduce((sum, s) => sum + (s.result?.totalScanned ?? 0), 0);
+    const cities = new Set(allSearches.map((s) => s.location.split(",")[0].trim().toLowerCase())).size;
     return { totalLeads, totalScanned, cities, savedCount: saved.length };
-  }, [saved]);
+  }, [saved, searchHistory]);
 
-  const recent = saved.slice(0, 5);
+  const recent = searchHistory.slice(0, 5);
 
   const onQuickSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,37 +224,37 @@ function DashboardPage() {
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Bookmark className="h-4 w-4 text-accent" />
-              <h3 className="font-display text-xl text-foreground">Recent searches</h3>
+              <Clock className="h-4 w-4 text-accent" />
+              <h3 className="font-display text-xl text-foreground">Search history</h3>
             </div>
             <Link
-              to="/saved"
+              to="/search"
               className="text-xs text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
             >
-              View all <ArrowRight className="h-3 w-3" />
+              New search <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 
           {recent.length === 0 ? (
             <div className="mt-6 rounded-2xl border border-dashed border-border/60 p-8 text-center">
               <div className="mx-auto h-10 w-10 rounded-full grid place-items-center bg-background/40 mb-3">
-                <Plus className="h-4 w-4 text-muted-foreground" />
+                <Search className="h-4 w-4 text-muted-foreground" />
               </div>
               <p className="text-sm text-muted-foreground">
-                No saved searches yet. Run a search and bookmark it to see it here.
+                No searches yet. Start searching to see your history here.
               </p>
               <Link
                 to="/search"
                 className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
               >
-                Start your first search <ArrowRight className="h-3 w-3" />
+                Run your first search <ArrowRight className="h-3 w-3" />
               </Link>
             </div>
           ) : (
             <ul className="mt-5 space-y-2">
-              {recent.map((s, i) => (
+              {recent.map((h, i) => (
                 <li
-                  key={s.id}
+                  key={h.id}
                   className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-all hover:bg-background/40 border border-transparent hover:border-border/60 animate-rise"
                   style={{ animationDelay: `${150 + i * 50}ms` }}
                 >
@@ -258,13 +265,14 @@ function DashboardPage() {
                     <MapPin className="h-4 w-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {h.keyword ? `${h.keyword} in ${h.location}` : h.location}
+                    </p>
                     <p className="text-xs text-muted-foreground truncate">
-                      {s.location} · {s.radius}km
-                      {s.keyword ? ` · ${s.keyword}` : ""}
+                      {h.radius}km · {new Date(h.searchedAt).toLocaleDateString()}
                     </p>
                   </div>
-                  {s.result && (
+                  {h.result && (
                     <span
                       className="hidden sm:inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] uppercase tracking-wider"
                       style={{
@@ -272,13 +280,13 @@ function DashboardPage() {
                         color: "var(--accent)",
                       }}
                     >
-                      {s.result.withoutWebsite} leads
+                      {h.result.withoutWebsite} leads
                     </span>
                   )}
                   <Link
-                    to="/saved"
+                    to="/search"
                     className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-background/60"
-                    aria-label="Open saved search"
+                    aria-label="View search results"
                   >
                     <Eye className="h-4 w-4 text-muted-foreground" />
                   </Link>
