@@ -63,11 +63,17 @@ export function humanizeAuthError(code: string | undefined, fallback?: string): 
     case "auth/operation-not-allowed":
       return "This sign-in method isn't enabled in your Firebase project.";
     default:
-      return fallback || (code ? `Sign-in failed (${code}).` : "Something went wrong. Please try again.");
+      return (
+        fallback || (code ? `Sign-in failed (${code}).` : "Something went wrong. Please try again.")
+      );
   }
 }
 
 export function isInIframe(): boolean {
   if (typeof window === "undefined") return false;
-  try { return window.self !== window.top; } catch { return true; }
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
 }

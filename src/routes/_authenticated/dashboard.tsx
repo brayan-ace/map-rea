@@ -6,6 +6,8 @@ import {
   type SearchHistory,
   fetchSavedSearches,
   loadSavedCache,
+  persistCache,
+  deleteSavedSearch as deleteSavedSearchRemote,
   loadHistoryCache,
   fetchSearchHistory,
 } from "@/lib/user-data";
@@ -235,74 +237,74 @@ function DashboardPage() {
             </Link>
           </div>
 
-          {recent.length === 0 ? (
-            <div className="mt-6 rounded-2xl border border-dashed border-border/60 p-8 text-center">
-              <div className="mx-auto h-10 w-10 rounded-full grid place-items-center bg-background/40 mb-3">
-                <Search className="h-4 w-4 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                No searches yet. Start searching to see your history here.
-              </p>
-              <Link
-                to="/search"
-                className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
-              >
-                Run your first search <ArrowRight className="h-3 w-3" />
-              </Link>
-            </div>
-          ) : (
-            <ul className="mt-5 space-y-2">
-              {recent.map((h, i) => (
-                <li
-                  key={h.id}
-                  className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-all hover:bg-background/40 border border-transparent hover:border-border/60 animate-rise"
-                  style={{ animationDelay: `${150 + i * 50}ms` }}
-                >
-                  <div
-                    className="h-9 w-9 rounded-lg grid place-items-center text-primary-foreground shrink-0"
-                    style={{ background: "var(--gradient-primary)" }}
-                  >
-                    <MapPin className="h-4 w-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
-                      {h.keyword ? `${h.keyword} in ${h.location}` : h.location}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {h.radius}km · {new Date(h.searchedAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  {h.result && (
-                    <span
-                      className="hidden sm:inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] uppercase tracking-wider"
-                      style={{
-                        background: "color-mix(in oklab, var(--accent) 14%, transparent)",
-                        color: "var(--accent)",
-                      }}
-                    >
-                      {h.result.withoutWebsite} leads
-                    </span>
-                  )}
-                  <Link
-                    to="/search"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-background/60"
-                    aria-label="View search results"
-                  >
-                    <Eye className="h-4 w-4 text-muted-foreground" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+           {recent.length === 0 ? (
+             <div className="mt-6 rounded-2xl border border-dashed border-border/60 p-8 text-center">
+               <div className="mx-auto h-10 w-10 rounded-full grid place-items-center bg-background/40 mb-3">
+                 <Search className="h-4 w-4 text-muted-foreground" />
+               </div>
+               <p className="text-sm text-muted-foreground">
+                 No searches yet. Start searching to see your history here.
+               </p>
+               <Link
+                 to="/search"
+                 className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
+               >
+                 Run your first search <ArrowRight className="h-3 w-3" />
+               </Link>
+             </div>
+           ) : (
+             <ul className="mt-5 space-y-2">
+               {recent.map((h, i) => (
+                 <li
+                   key={h.id}
+                   className="group flex items-center gap-3 rounded-xl px-3 py-3 transition-all hover:bg-background/40 border border-transparent hover:border-border/60 animate-rise"
+                   style={{ animationDelay: `${150 + i * 50}ms` }}
+                 >
+                   <div
+                     className="h-9 w-9 rounded-lg grid place-items-center text-primary-foreground shrink-0"
+                     style={{ background: "var(--gradient-primary)" }}
+                   >
+                     <MapPin className="h-4 w-4" />
+                   </div>
+                   <div className="flex-1 min-w-0">
+                     <p className="text-sm font-medium text-foreground truncate">
+                       {h.keyword ? `${h.keyword} in ${h.location}` : h.location}
+                       {h.businessTypes.length > 0 ? ` (${h.businessTypes.join(', ')})` : ''}
+                     </p>
+                     <p className="text-xs text-muted-foreground truncate">
+                       {h.radius}km · {new Date(h.searchedAt).toLocaleDateString()}
+                       {h.minRating > 0 ? ` · Min ${h.minRating}⭐` : ''}
+                       {h.hasPhone ? ` · Phone only` : ''}
+                     </p>
+                   </div>
+                   {h.result && (
+                     <span
+                       className="hidden sm:inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] uppercase tracking-wider"
+                       style={{
+                         background: "color-mix(in oklab, var(--accent) 14%, transparent)",
+                         color: "var(--accent)",
+                       }}
+                     >
+                       {h.result.withoutWebsite} leads
+                     </span>
+                   )}
+                   <Link
+                     to="/search"
+                     className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg hover:bg-background/60"
+                     aria-label="View search results"
+                   >
+                     <Eye className="h-4 w-4" />
+                   </Link>
+                 </li>
+               ))}
+             </ul>
+           )}
         </div>
 
         {/* Outreach tip card */}
         <div
-          className="rounded-3xl p-6 animate-rise relative overflow-hidden"
+          className="rounded-3xl p-6 animate-rise relative overflow-hidden card-premium"
           style={{
-            background: "linear-gradient(160deg, oklch(0.32 0.18 165 / 0.4), oklch(0.18 0.06 270 / 0.6))",
-            border: "1px solid color-mix(in oklab, var(--accent) 30%, transparent)",
-            boxShadow: "var(--shadow-card)",
             animationDelay: "180ms",
           }}
         >
@@ -315,14 +317,14 @@ function DashboardPage() {
               The first message wins the deal.
             </h3>
             <p className="mt-3 text-sm text-muted-foreground">
-              Personalize your WhatsApp template in your profile — mention what they're missing
+              Personalize your WhatsApp template before reaching out — mention what they're missing
               without a website, then offer to send a 5-minute preview.
             </p>
             <Link
-              to="/profile"
+              to="/search"
               className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-accent hover:underline"
             >
-              Customize template <ArrowRight className="h-3 w-3" />
+              Find leads & customize <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
         </div>

@@ -38,11 +38,29 @@ function SavedPage() {
   const { user } = useAuth();
   const [items, setItems] = useState<SavedSearch[]>([]);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const loadSaved = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const data = await fetchSavedSearches(user.uid);
+      console.log("Fetched saved searches:", data);
+      setItems(data);
+      setError(null);
+    } catch (err: any) {
+      console.error("Failed to fetch saved searches:", err);
+      setError(err.message || "Failed to load saved searches");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
     setItems(loadSavedCache(user.uid));
-    fetchSavedSearches(user.uid).then(setItems).catch(() => {});
+    loadSaved();
   }, [user]);
 
   const remove = (id: string) => {
@@ -63,19 +81,37 @@ function SavedPage() {
             Saved <span className="italic text-gradient">searches.</span>
           </h1>
           <p className="mt-3 text-sm text-muted-foreground max-w-xl">
-            Every saved search keeps a snapshot of its leads — open it any time,
-            no need to re-scan.
+            Every saved search keeps a snapshot of its leads — open it any time, no need to re-scan.
           </p>
         </div>
-        <Link
-          to="/search"
-          className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-primary-foreground"
-          style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
-        >
-          <Search className="h-4 w-4" />
-          New search
-        </Link>
+        <div className="flex gap-2">
+          <Button
+            onClick={loadSaved}
+            disabled={loading}
+            variant="outline"
+            size="sm"
+            className="h-10 border-border/60 hover:bg-background/60"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+          <Link
+            to="/search"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-primary-foreground"
+            style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
+          >
+            <Search className="h-4 w-4" />
+            New search
+          </Link>
+        </div>
       </div>
+
+      {error && (
+        <div className="mb-6 rounded-2xl p-4 border border-destructive/40 bg-destructive/10">
+          <p className="text-sm text-destructive-foreground">
+            Error loading saved searches: {error}
+          </p>
+        </div>
+      )}
 
       {items.length === 0 ? (
         <div className="rounded-3xl p-12 text-center card-premium animate-rise">
@@ -164,7 +200,11 @@ function SavedPage() {
                     <div className="mt-4 flex justify-end">
                       <Link
                         to="/search"
-                        search={{ q: `location=${encodeURIComponent(s.location)}&keyword=${encodeURIComponent(s.keyword)}` } as never}
+                        search={
+                          {
+                            q: `location=${encodeURIComponent(s.location)}&keyword=${encodeURIComponent(s.keyword)}`,
+                          } as never
+                        }
                         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
                       >
                         <RefreshCw className="h-3 w-3" />
@@ -181,7 +221,11 @@ function SavedPage() {
                     </p>
                     <Link
                       to="/search"
-                      search={{ q: `location=${encodeURIComponent(s.location)}&keyword=${encodeURIComponent(s.keyword)}` } as never}
+                      search={
+                        {
+                          q: `location=${encodeURIComponent(s.location)}&keyword=${encodeURIComponent(s.keyword)}`,
+                        } as never
+                      }
                       className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline"
                     >
                       Run search <ArrowRight className="h-3 w-3" />
@@ -230,7 +274,12 @@ function SavedLeadRow({ lead }: { lead: Lead }) {
           ) : (
             <span className="opacity-60">no phone</span>
           )}
-          <a href={lead.mapsUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-foreground">
+          <a
+            href={lead.mapsUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 hover:text-foreground"
+          >
             <Globe2 className="h-3 w-3" /> Maps
           </a>
         </div>
@@ -251,7 +300,10 @@ function SavedLeadRow({ lead }: { lead: Lead }) {
             WhatsApp
           </a>
         ) : (
-          <span><MessageCircle className="h-3.5 w-3.5 mr-1.5" />No phone</span>
+          <span>
+            <MessageCircle className="h-3.5 w-3.5 mr-1.5" />
+            No phone
+          </span>
         )}
       </Button>
     </div>

@@ -12,6 +12,9 @@ import {
   Menu,
   X,
   Sparkles,
+  Users,
+  TrendingUp,
+  Mail,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
@@ -19,6 +22,9 @@ import { useTheme } from "@/lib/theme-context";
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/search", label: "Find leads", icon: Search },
+  { to: "/crm", label: "CRM", icon: Users },
+  { to: "/analytics", label: "Analytics", icon: TrendingUp },
+  { to: "/email-templates", label: "Email", icon: Mail },
   { to: "/saved", label: "Saved searches", icon: Bookmark },
   { to: "/profile", label: "Profile", icon: UserCircle2 },
 ] as const;
@@ -36,19 +42,28 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
+    <div
+      className="relative min-h-screen overflow-hidden"
+      style={{ background: "var(--gradient-hero)" }}
+    >
       {/* Ambient layers */}
       <div
         className="orb float-slow"
         style={{
-          width: 540, height: 540, top: -180, left: -140,
+          width: 540,
+          height: 540,
+          top: -180,
+          left: -140,
           background: "radial-gradient(circle, oklch(0.55 0.22 285 / 0.55), transparent 60%)",
         }}
       />
       <div
         className="orb float-slow"
         style={{
-          width: 460, height: 460, top: 200, right: -160,
+          width: 460,
+          height: 460,
+          top: 200,
+          right: -160,
           background: "radial-gradient(circle, oklch(0.78 0.16 200 / 0.4), transparent 60%)",
           animationDelay: "-5s",
         }}
@@ -71,8 +86,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                   className="group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-all"
                   style={{
                     background: active ? "var(--gradient-card)" : "transparent",
-                    color: active ? "var(--foreground)" : "color-mix(in oklab, var(--foreground) 65%, transparent)",
-                    border: active ? "1px solid color-mix(in oklab, var(--primary) 30%, transparent)" : "1px solid transparent",
+                    color: active
+                      ? "var(--foreground)"
+                      : "color-mix(in oklab, var(--foreground) 65%, transparent)",
+                    border: active
+                      ? "1px solid color-mix(in oklab, var(--primary) 30%, transparent)"
+                      : "1px solid transparent",
                     boxShadow: active ? "var(--shadow-soft)" : undefined,
                   }}
                 >
@@ -92,12 +111,17 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="mt-auto space-y-3">
             <div
               className="rounded-2xl p-4 relative overflow-hidden"
-              style={{ background: "var(--gradient-card)", border: "1px solid color-mix(in oklab, var(--accent) 25%, transparent)" }}
+              style={{
+                background: "var(--gradient-card)",
+                border: "1px solid color-mix(in oklab, var(--accent) 25%, transparent)",
+              }}
             >
               <Sparkles className="absolute -top-2 -right-2 h-12 w-12 text-accent/20" />
               <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Live data</p>
               <p className="mt-1 font-display text-lg leading-tight text-foreground">
-                Google Maps,<br />in real time.
+                Google Maps,
+                <br />
+                in real time.
               </p>
             </div>
 
@@ -123,7 +147,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         {/* Mobile drawer */}
         {mobileOpen && (
           <div className="lg:hidden fixed inset-0 z-50">
-            <div className="absolute inset-0 bg-background/80 backdrop-blur-md" onClick={() => setMobileOpen(false)} />
+            <div
+              className="absolute inset-0 bg-background/80 backdrop-blur-md"
+              onClick={() => setMobileOpen(false)}
+            />
             <div className="absolute inset-y-0 right-0 w-[80%] max-w-[320px] bg-background/95 backdrop-blur-xl border-l border-border/60 p-6 flex flex-col animate-rise">
               <div className="flex items-center justify-between">
                 <Brand />
@@ -147,8 +174,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                       className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm"
                       style={{
                         background: active ? "var(--gradient-card)" : "transparent",
-                        color: active ? "var(--foreground)" : "color-mix(in oklab, var(--foreground) 65%, transparent)",
-                        border: active ? "1px solid color-mix(in oklab, var(--primary) 30%, transparent)" : "1px solid transparent",
+                        color: active
+                          ? "var(--foreground)"
+                          : "color-mix(in oklab, var(--foreground) 65%, transparent)",
+                        border: active
+                          ? "1px solid color-mix(in oklab, var(--primary) 30%, transparent)"
+                          : "1px solid transparent",
                       }}
                     >
                       <Icon className="h-4 w-4" />
@@ -165,9 +196,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
 
         {/* Main content */}
-        <main className="flex-1 min-w-0 pt-16 lg:pt-0">
-          {children}
-        </main>
+        <main className="flex-1 min-w-0 pt-16 lg:pt-0">{children}</main>
       </div>
     </div>
   );
@@ -223,7 +252,11 @@ function UserPill({
   return (
     <div className="rounded-2xl p-3 flex items-center gap-3 card-premium">
       {user.photoURL ? (
-        <img src={user.photoURL} alt="" className="h-9 w-9 rounded-full object-cover ring-1 ring-border" />
+        <img
+          src={user.photoURL}
+          alt=""
+          className="h-9 w-9 rounded-full object-cover ring-1 ring-border"
+        />
       ) : (
         <div
           className="h-9 w-9 rounded-full grid place-items-center text-sm font-semibold text-primary-foreground"

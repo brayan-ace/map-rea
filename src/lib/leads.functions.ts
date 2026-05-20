@@ -5,6 +5,10 @@ const SearchSchema = z.object({
   location: z.string().min(2).max(200),
   radiusKm: z.number().min(1).max(100),
   keyword: z.string().max(100).optional().default(""),
+  minRating: z.number().min(0).max(5).optional(),
+  hasPhone: z.boolean().optional(),
+  openNow: z.boolean().optional(),
+  businessTypes: z.array(z.string()).optional(),
 });
 
 export type Lead = {
@@ -248,11 +252,39 @@ export const searchLeads = createServerFn({ method: "POST" })
       for (const p of textResult.places) byId.set(p.id, p);
     }
 
-    const all = Array.from(byId.values()).filter(
-      (p) => p.businessStatus !== "CLOSED_PERMANENTLY",
-    );
+    const all = Array.from(byId.values()).filter((p) => p.businessStatus !== "CLOSED_PERMANENTLY");
 
-    const withoutSite = all.filter((p) => !p.websiteUri || p.websiteUri.trim() === "");
+    // Apply additional filters
+    const filtered = all.filter((p) => {
+      // Filter by minimum rating
+      if (data.minRating !== undefined && data.minRating > 0) {
+        const rating = p.rating ?? 0;
+        if (rating < data.minRating) return false;
+      }
+
+      // Filter by phone availability
+      if (data.hasPhone !== undefined) {
+        const hasPhone = !!p.internationalPhoneNumber || !!p.nationalPhoneNumber;
+        if (data.hasPhone && !hasPhone) return false;
+        if (!data.hasPhone && hasPhone) return false;
+      }
+
+      // Filter by open status (requires businessStatus or types check)
+      // Note: Places API doesn't directly provide open now without additional calls
+      // For now we'll skip this as it would require additional API calls
+      // Could implement by checking opening_hours in a separate call if needed
+
+      // Filter by business types
+      if (data.businessTypes?.length) {
+        const pTypes = p.types ?? [];
+        const matches = data.businessTypes.some((bt) => pTypes.includes(bt));
+        if (!matches) return false;
+      }
+
+      return true;
+    });
+
+    const withoutSite = filtered.filter((p) => !p.websiteUri || p.websiteUri.trim() === "");
 
     const leads: Lead[] = withoutSite.map((p) => ({
       id: p.id,
@@ -274,7 +306,7 @@ export const searchLeads = createServerFn({ method: "POST" })
 
     return {
       leads,
-      totalScanned: all.length,
+      totalScanned: filtered.length,
       withoutWebsite: leads.length,
       locationLabel: center.label,
       error: leads.length === 0 && firstError ? firstError : undefined,

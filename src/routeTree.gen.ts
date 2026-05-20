@@ -16,7 +16,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedSearchRouteImport } from './routes/_authenticated/search'
 import { Route as AuthenticatedSavedRouteImport } from './routes/_authenticated/saved'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedEmailTemplatesRouteImport } from './routes/_authenticated/email-templates'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCrmRouteImport } from './routes/_authenticated/crm'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -52,9 +55,25 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEmailTemplatesRoute =
+  AuthenticatedEmailTemplatesRouteImport.update({
+    id: '/email-templates',
+    path: '/email-templates',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCrmRoute = AuthenticatedCrmRouteImport.update({
+  id: '/crm',
+  path: '/crm',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 
@@ -62,7 +81,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/crm': typeof AuthenticatedCrmRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/email-templates': typeof AuthenticatedEmailTemplatesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/search': typeof AuthenticatedSearchRoute
@@ -71,7 +93,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/crm': typeof AuthenticatedCrmRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/email-templates': typeof AuthenticatedEmailTemplatesRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/saved': typeof AuthenticatedSavedRoute
   '/search': typeof AuthenticatedSearchRoute
@@ -82,7 +107,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/crm': typeof AuthenticatedCrmRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/email-templates': typeof AuthenticatedEmailTemplatesRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/saved': typeof AuthenticatedSavedRoute
   '/_authenticated/search': typeof AuthenticatedSearchRoute
@@ -93,7 +121,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/analytics'
+    | '/crm'
     | '/dashboard'
+    | '/email-templates'
     | '/profile'
     | '/saved'
     | '/search'
@@ -102,7 +133,10 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/onboarding'
+    | '/analytics'
+    | '/crm'
     | '/dashboard'
+    | '/email-templates'
     | '/profile'
     | '/saved'
     | '/search'
@@ -112,7 +146,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/onboarding'
+    | '/_authenticated/analytics'
+    | '/_authenticated/crm'
     | '/_authenticated/dashboard'
+    | '/_authenticated/email-templates'
     | '/_authenticated/profile'
     | '/_authenticated/saved'
     | '/_authenticated/search'
@@ -176,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/email-templates': {
+      id: '/_authenticated/email-templates'
+      path: '/email-templates'
+      fullPath: '/email-templates'
+      preLoaderRoute: typeof AuthenticatedEmailTemplatesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -183,18 +227,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/crm': {
+      id: '/_authenticated/crm'
+      path: '/crm'
+      fullPath: '/crm'
+      preLoaderRoute: typeof AuthenticatedCrmRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedCrmRoute: typeof AuthenticatedCrmRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEmailTemplatesRoute: typeof AuthenticatedEmailTemplatesRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedSavedRoute: typeof AuthenticatedSavedRoute
   AuthenticatedSearchRoute: typeof AuthenticatedSearchRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedCrmRoute: AuthenticatedCrmRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEmailTemplatesRoute: AuthenticatedEmailTemplatesRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedSavedRoute: AuthenticatedSavedRoute,
   AuthenticatedSearchRoute: AuthenticatedSearchRoute,

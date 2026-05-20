@@ -88,7 +88,11 @@ function OnboardingPage() {
     setSaving(true);
     try {
       if (displayName && displayName !== user.displayName) {
-        try { await updateProfile(getFirebaseAuth().currentUser!, { displayName }); } catch { /* ignore */ }
+        try {
+          await updateProfile(getFirebaseAuth().currentUser!, { displayName });
+        } catch {
+          /* ignore */
+        }
       }
       await completeOnboarding(user.uid, {
         displayName,
@@ -105,42 +109,80 @@ function OnboardingPage() {
 
   if (loading || checking) {
     return (
-      <div className="min-h-screen grid place-items-center" style={{ background: "var(--gradient-hero)" }}>
+      <div
+        className="min-h-screen grid place-items-center"
+        style={{ background: "var(--gradient-hero)" }}
+      >
         <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
-      <div className="orb float-slow" style={{ width: 520, height: 520, top: -160, left: -120, background: "radial-gradient(circle, oklch(0.62 0.22 275 / 0.55), transparent 60%)" }} />
-      <div className="orb float-slow" style={{ width: 480, height: 480, bottom: -160, right: -120, background: "radial-gradient(circle, oklch(0.7 0.18 195 / 0.45), transparent 60%)", animationDelay: "-4s" }} />
+    <div
+      className="relative min-h-screen overflow-hidden"
+      style={{ background: "var(--gradient-hero)" }}
+    >
+      <div
+        className="orb float-slow"
+        style={{
+          width: 520,
+          height: 520,
+          top: -160,
+          left: -120,
+          background: "radial-gradient(circle, oklch(0.62 0.22 275 / 0.55), transparent 60%)",
+        }}
+      />
+      <div
+        className="orb float-slow"
+        style={{
+          width: 480,
+          height: 480,
+          bottom: -160,
+          right: -120,
+          background: "radial-gradient(circle, oklch(0.7 0.18 195 / 0.45), transparent 60%)",
+          animationDelay: "-4s",
+        }}
+      />
       <div className="absolute inset-0 grid-bg pointer-events-none" />
 
       <div className="relative z-10 container mx-auto max-w-2xl px-4 py-10 sm:py-16">
         {/* Brand */}
         <div className="flex items-center gap-2.5 justify-center mb-8 animate-rise">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}>
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center"
+            style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
+          >
             <MapPin className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-display font-semibold tracking-tight text-foreground text-lg">Lead Finder</span>
+          <span className="font-display font-semibold tracking-tight text-foreground text-lg">
+            Lead Finder
+          </span>
         </div>
 
         {/* Progress */}
         <div className="mb-8 animate-rise" style={{ animationDelay: "60ms" }}>
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-            <span>Step {step + 1} of {totalSteps}</span>
+            <span>
+              Step {step + 1} of {totalSteps}
+            </span>
             <span className="tabular-nums">{Math.round(((step + 1) / totalSteps) * 100)}%</span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-background/40 overflow-hidden border border-border/40">
             <div
               className="h-full transition-all duration-500"
-              style={{ width: `${((step + 1) / totalSteps) * 100}%`, background: "var(--gradient-primary)" }}
+              style={{
+                width: `${((step + 1) / totalSteps) * 100}%`,
+                background: "var(--gradient-primary)",
+              }}
             />
           </div>
         </div>
 
-        <Card className="glass p-6 sm:p-8 border-0 animate-rise" style={{ boxShadow: "var(--shadow-card)", animationDelay: "120ms" }}>
+        <Card
+          className="glass p-6 sm:p-8 border-0 animate-rise"
+          style={{ boxShadow: "var(--shadow-card)", animationDelay: "120ms" }}
+        >
           {step === 0 && (
             <div className="space-y-5">
               <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/30 px-3 py-1 text-xs text-muted-foreground">
@@ -148,20 +190,38 @@ function OnboardingPage() {
                 Welcome aboard
               </div>
               <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-                <span className="text-foreground">Hey{displayName ? `, ${displayName.split(" ")[0]}` : ""}</span>{" "}
+                <span className="text-foreground">
+                  Hey{displayName ? `, ${displayName.split(" ")[0]}` : ""}
+                </span>{" "}
                 <span className="text-gradient">— let's set you up.</span>
               </h1>
               <p className="text-muted-foreground">
-                Lead Finder scans Google Maps for businesses without a website and lets you pitch them on
-                WhatsApp in a single tap. Two minutes of setup and you're ready to ship outreach.
+                Lead Finder scans Google Maps for businesses without a website and lets you pitch
+                them on WhatsApp in a single tap. Two minutes of setup and you're ready to ship
+                outreach.
               </p>
               <div className="grid sm:grid-cols-3 gap-3 pt-2">
                 {[
-                  { icon: Search, t: "Scan any city", d: "Pull live business data from Google Maps." },
-                  { icon: Globe2, t: "No-website filter", d: "Only see businesses worth pitching." },
-                  { icon: MessageCircle, t: "WhatsApp in one tap", d: "Personalized message ready to send." },
+                  {
+                    icon: Search,
+                    t: "Scan any city",
+                    d: "Pull live business data from Google Maps.",
+                  },
+                  {
+                    icon: Globe2,
+                    t: "No-website filter",
+                    d: "Only see businesses worth pitching.",
+                  },
+                  {
+                    icon: MessageCircle,
+                    t: "WhatsApp in one tap",
+                    d: "Personalized message ready to send.",
+                  },
                 ].map((f) => (
-                  <div key={f.t} className="rounded-xl border border-border/60 bg-background/30 p-3">
+                  <div
+                    key={f.t}
+                    className="rounded-xl border border-border/60 bg-background/30 p-3"
+                  >
                     <f.icon className="w-4 h-4 text-accent mb-2" />
                     <p className="font-semibold text-sm text-foreground">{f.t}</p>
                     <p className="text-xs text-muted-foreground mt-1">{f.d}</p>
@@ -169,7 +229,10 @@ function OnboardingPage() {
                 ))}
               </div>
               <div>
-                <Label htmlFor="dn" className="text-xs uppercase tracking-wider text-muted-foreground">
+                <Label
+                  htmlFor="dn"
+                  className="text-xs uppercase tracking-wider text-muted-foreground"
+                >
                   What should we call you?
                 </Label>
                 <Input
@@ -205,8 +268,17 @@ function OnboardingPage() {
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg grid place-items-center" style={{ background: active ? "var(--gradient-primary)" : "color-mix(in oklab, var(--background) 50%, transparent)" }}>
-                          <Icon className={`w-4 h-4 ${active ? "text-primary-foreground" : "text-foreground"}`} />
+                        <div
+                          className="w-9 h-9 rounded-lg grid place-items-center"
+                          style={{
+                            background: active
+                              ? "var(--gradient-primary)"
+                              : "color-mix(in oklab, var(--background) 50%, transparent)",
+                          }}
+                        >
+                          <Icon
+                            className={`w-4 h-4 ${active ? "text-primary-foreground" : "text-foreground"}`}
+                          />
                         </div>
                         <span className="font-semibold text-foreground">{r.label}</span>
                         {active && <CheckCircle2 className="w-4 h-4 text-accent ml-auto" />}
@@ -249,8 +321,12 @@ function OnboardingPage() {
                 })}
               </div>
               <div className="pt-2">
-                <Label htmlFor="region" className="text-xs uppercase tracking-wider text-muted-foreground">
-                  Primary city or region you'll target <span className="normal-case text-muted-foreground/70">(optional)</span>
+                <Label
+                  htmlFor="region"
+                  className="text-xs uppercase tracking-wider text-muted-foreground"
+                >
+                  Primary city or region you'll target{" "}
+                  <span className="normal-case text-muted-foreground/70">(optional)</span>
                 </Label>
                 <div className="relative mt-2">
                   <MapPin className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -272,10 +348,14 @@ function OnboardingPage() {
                 Almost there.
               </h2>
               <p className="text-muted-foreground">
-                Add a short signature so your WhatsApp pitches feel personal. You can change this anytime in Profile.
+                Add a short signature so your WhatsApp pitches feel personal. You can change this
+                anytime in Profile.
               </p>
               <div>
-                <Label htmlFor="sig" className="text-xs uppercase tracking-wider text-muted-foreground">
+                <Label
+                  htmlFor="sig"
+                  className="text-xs uppercase tracking-wider text-muted-foreground"
+                >
                   Your signature
                 </Label>
                 <Textarea
@@ -288,11 +368,22 @@ function OnboardingPage() {
                 />
               </div>
               <div className="rounded-xl border border-border/60 bg-background/30 p-4">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">You're all set</p>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
+                  You're all set
+                </p>
                 <ul className="text-sm text-foreground space-y-1.5">
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-accent" /> Your data syncs to your account automatically.</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-accent" /> Saved searches keep their full results.</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-accent" /> Sign in anywhere — your work follows you.</li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-accent" /> Your data syncs to your account
+                    automatically.
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-accent" /> Saved searches keep their full
+                    results.
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-accent" /> Sign in anywhere — your work
+                    follows you.
+                  </li>
                 </ul>
               </div>
             </div>
