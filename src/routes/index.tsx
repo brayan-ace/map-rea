@@ -220,8 +220,8 @@ function LandingPage() {
       <section className="relative pt-32 sm:pt-40 pb-20 px-5 sm:px-8 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl animate-float-dance" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl animate-float-dance" style={{animationDelay: '0.5s'}} />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-[1400px] mx-auto">
@@ -267,7 +267,7 @@ function LandingPage() {
             </div>
 
             {/* Auto-scrolling carousel - Below text */}
-            <div className="w-full max-w-4xl relative animate-float-dance" style={{animationDelay: '0.5s'}}>
+            <div className="w-full max-w-4xl relative">
               <div className="rounded-2xl overflow-hidden border border-primary/20 bg-card/50 p-1 shadow-2xl hover:shadow-3xl transition-shadow duration-500 hover:scale-105">
                 <div className="rounded-xl overflow-hidden backdrop-blur-sm">
                   <ImageCarousel />
@@ -275,8 +275,8 @@ function LandingPage() {
               </div>
               
               {/* Floating elements for premium feel */}
-              <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/10 rounded-full blur-2xl -z-10 animate-float-dance" />
-              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-accent/10 rounded-full blur-2xl -z-10 animate-float-dance" style={{animationDelay: '0.3s'}} />
+              <div className="absolute -top-8 -right-8 w-32 h-32 bg-primary/10 rounded-full blur-2xl -z-10" />
+              <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-accent/10 rounded-full blur-2xl -z-10" />
             </div>
           </div>
         </div>
