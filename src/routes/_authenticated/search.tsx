@@ -259,7 +259,7 @@ function SearchPage() {
   return (
     <div className="px-5 sm:px-8 lg:px-12 py-8 lg:py-12 max-w-[1400px] mx-auto pb-24">
       {/* Header */}
-      <div className="mb-8 animate-rise">
+      <div className="mb-8">
         <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Search</p>
         <h1 className="mt-2 font-display text-[2.25rem] sm:text-5xl text-foreground leading-[0.95]">
           Scan a city for <span className="italic text-gradient">website-less businesses.</span>
@@ -268,7 +268,7 @@ function SearchPage() {
 
       {/* Search panel */}
       <div
-        className="relative overflow-hidden rounded-3xl p-6 lg:p-8 animate-rise"
+        className="relative overflow-hidden rounded-3xl p-6 lg:p-8"
         style={{
           background: "var(--gradient-card)",
           border: "1px solid color-mix(in oklab, var(--primary) 22%, transparent)",
@@ -359,7 +359,7 @@ function SearchPage() {
               >
                 Phone Number Required
               </Label>
-              <div class="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   id="hasPhone"
@@ -372,80 +372,6 @@ function SearchPage() {
             </div>
 
             <div className="space-y-2">
-              <Label
-                htmlFor="businessTypes"
-                className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground"
-              >
-                Business Types
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  "restaurant",
-                  "cafe",
-                  "bakery",
-                  "bar",
-                  "meal_takeaway",
-                  "lodging",
-                  "store",
-                  "clothing_store",
-                  "shoe_store",
-                  "jewelry_store",
-                  "furniture_store",
-                  "home_goods_store",
-                  "beauty_salon",
-                  "hair_care",
-                  "spa",
-                  "nail_salon",
-                  "gym",
-                  "physiotherapist",
-                  "car_repair",
-                  "car_wash",
-                  "car_dealer",
-                  "plumber",
-                  "electrician",
-                  "painter",
-                  "roofing_contractor",
-                  "locksmith",
-                  "moving_company",
-                  "dentist",
-                  "doctor",
-                  "veterinary_care",
-                  "real_estate_agency",
-                  "insurance_agency",
-                  "lawyer",
-                  "accounting",
-                  "pet_store",
-                  "florist",
-                  "book_store",
-                ].map((type) => (
-                  <label
-                    key={type}
-                    className="flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium hover:border-primary/50"
-                  >
-                    <input
-                      type="checkbox"
-                      value={type}
-                      checked={businessTypes.includes(type)}
-                      onChange={(e) => {
-                        const checked = e.target.checked;
-                        setBusinessTypes((prev) =>
-                          checked ? [...prev, type] : prev.filter((t) => t !== type),
-                        );
-                      }}
-                      className="h-3 w-3"
-                    />
-                    <span className="text-[10px]">{type.replace(/_/g, " ")}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="mt-2 text-xs text-muted-foreground">
-                Selected: {businessTypes.length > 0 ? businessTypes.join(", ") : "None"}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 md:col-span-2">
-            <div className="flex items-center justify-between">
               <Label className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                 Search radius
               </Label>

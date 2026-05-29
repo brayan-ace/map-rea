@@ -19,6 +19,7 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedEmailTemplatesRouteImport } from './routes/_authenticated/email-templates'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCrmRouteImport } from './routes/_authenticated/crm'
+import { Route as AuthenticatedClientPlaybookRouteImport } from './routes/_authenticated/client-playbook'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -71,6 +72,12 @@ const AuthenticatedCrmRoute = AuthenticatedCrmRouteImport.update({
   path: '/crm',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedClientPlaybookRoute =
+  AuthenticatedClientPlaybookRouteImport.update({
+    id: '/client-playbook',
+    path: '/client-playbook',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -82,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/client-playbook': typeof AuthenticatedClientPlaybookRoute
   '/crm': typeof AuthenticatedCrmRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-templates': typeof AuthenticatedEmailTemplatesRoute
@@ -94,6 +102,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
+  '/client-playbook': typeof AuthenticatedClientPlaybookRoute
   '/crm': typeof AuthenticatedCrmRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/email-templates': typeof AuthenticatedEmailTemplatesRoute
@@ -108,6 +117,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/onboarding': typeof OnboardingRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
+  '/_authenticated/client-playbook': typeof AuthenticatedClientPlaybookRoute
   '/_authenticated/crm': typeof AuthenticatedCrmRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/email-templates': typeof AuthenticatedEmailTemplatesRoute
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/analytics'
+    | '/client-playbook'
     | '/crm'
     | '/dashboard'
     | '/email-templates'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/analytics'
+    | '/client-playbook'
     | '/crm'
     | '/dashboard'
     | '/email-templates'
@@ -147,6 +159,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/onboarding'
     | '/_authenticated/analytics'
+    | '/_authenticated/client-playbook'
     | '/_authenticated/crm'
     | '/_authenticated/dashboard'
     | '/_authenticated/email-templates'
@@ -234,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCrmRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/client-playbook': {
+      id: '/_authenticated/client-playbook'
+      path: '/client-playbook'
+      fullPath: '/client-playbook'
+      preLoaderRoute: typeof AuthenticatedClientPlaybookRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/analytics': {
       id: '/_authenticated/analytics'
       path: '/analytics'
@@ -246,6 +266,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
+  AuthenticatedClientPlaybookRoute: typeof AuthenticatedClientPlaybookRoute
   AuthenticatedCrmRoute: typeof AuthenticatedCrmRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmailTemplatesRoute: typeof AuthenticatedEmailTemplatesRoute
@@ -256,6 +277,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
+  AuthenticatedClientPlaybookRoute: AuthenticatedClientPlaybookRoute,
   AuthenticatedCrmRoute: AuthenticatedCrmRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmailTemplatesRoute: AuthenticatedEmailTemplatesRoute,

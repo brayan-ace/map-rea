@@ -15,12 +15,14 @@ import {
   Users,
   TrendingUp,
   Mail,
+  Lightbulb,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/client-playbook", label: "Client Playbook", icon: Lightbulb, highlighted: true },
   { to: "/search", label: "Find leads", icon: Search },
   { to: "/crm", label: "CRM", icon: Users },
   { to: "/analytics", label: "Analytics", icon: TrendingUp },
@@ -79,11 +81,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             {NAV.map((item) => {
               const active = path === item.to || path.startsWith(item.to + "/");
               const Icon = item.icon;
+              const isHighlighted = "highlighted" in item && item.highlighted;
               return (
                 <Link
                   key={item.to}
                   to={item.to}
-                  className="group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-all"
+                  className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-all ${
+                    isHighlighted && !active
+                      ? "border border-primary/50 hover:bg-primary/5"
+                      : ""
+                  }`}
                   style={{
                     background: active ? "var(--gradient-card)" : "transparent",
                     color: active
@@ -91,7 +98,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       : "color-mix(in oklab, var(--foreground) 65%, transparent)",
                     border: active
                       ? "1px solid color-mix(in oklab, var(--primary) 30%, transparent)"
-                      : "1px solid transparent",
+                      : undefined,
                     boxShadow: active ? "var(--shadow-soft)" : undefined,
                   }}
                 >
@@ -102,7 +109,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                     />
                   )}
                   <Icon className="h-4 w-4" />
-                  <span className="font-medium tracking-tight">{item.label}</span>
+                  <span className="font-medium tracking-tight flex items-center gap-2">
+                    {item.label}
+                    {isHighlighted && !active && (
+                      <span className="w-2 h-2 rounded-full bg-primary/50 animate-pulse" />
+                    )}
+                  </span>
                 </Link>
               );
             })}
@@ -166,12 +178,17 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {NAV.map((item) => {
                   const active = path === item.to || path.startsWith(item.to + "/");
                   const Icon = item.icon;
+                  const isHighlighted = "highlighted" in item && item.highlighted;
                   return (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm"
+                      className={`flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition-all ${
+                        isHighlighted && !active
+                          ? "border border-primary/50 hover:bg-primary/5"
+                          : ""
+                      }`}
                       style={{
                         background: active ? "var(--gradient-card)" : "transparent",
                         color: active
@@ -179,11 +196,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                           : "color-mix(in oklab, var(--foreground) 65%, transparent)",
                         border: active
                           ? "1px solid color-mix(in oklab, var(--primary) 30%, transparent)"
-                          : "1px solid transparent",
+                          : undefined,
                       }}
                     >
                       <Icon className="h-4 w-4" />
-                      <span className="font-medium">{item.label}</span>
+                      <span className="font-medium flex items-center gap-2">
+                        {item.label}
+                        {isHighlighted && !active && (
+                          <span className="w-2 h-2 rounded-full bg-primary/50 animate-pulse" />
+                        )}
+                      </span>
                     </Link>
                   );
                 })}
@@ -204,22 +226,20 @@ export function AppShell({ children }: { children: ReactNode }) {
 
 function Brand({ compact }: { compact?: boolean }) {
   return (
-    <Link to="/dashboard" className="flex items-center gap-2.5">
-      <div
-        className="h-9 w-9 rounded-xl grid place-items-center relative"
-        style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
-      >
-        <MapPin className="h-4 w-4 text-primary-foreground" />
-        <span className="absolute inset-0 rounded-xl pulse-ring" />
-      </div>
+    <Link to="/dashboard" className="flex items-center gap-3">
+      <img 
+        src="/images/assets/logo.png" 
+        alt="LeadGen" 
+        className="h-10 w-10 object-contain"
+      />
       {!compact && (
         <div className="leading-tight">
-          <p className="font-display text-lg text-foreground tracking-tight">Lead Finder</p>
-          <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Premium</p>
+          <p className="font-display text-lg text-foreground tracking-tight">LeadGen</p>
+          <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Platform</p>
         </div>
       )}
       {compact && (
-        <p className="font-display text-base text-foreground tracking-tight">Lead Finder</p>
+        <p className="font-display text-base text-foreground tracking-tight">LeadGen</p>
       )}
     </Link>
   );

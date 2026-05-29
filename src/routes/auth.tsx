@@ -56,7 +56,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate({ to: "/" });
+      navigate({ to: "/dashboard" });
     }
   }, [user, loading, navigate]);
 
@@ -411,7 +411,7 @@ function LoginForm({ active }: { active: boolean }) {
     setBusy(true);
     try {
       await signInWithEmailAndPassword(getFirebaseAuth(), email, password);
-      navigate({ to: "/" });
+      navigate({ to: "/dashboard" });
     } catch (err: any) {
       setError(humanizeAuthError(err?.code, "Sign in failed."));
     } finally {
@@ -425,7 +425,7 @@ function LoginForm({ active }: { active: boolean }) {
     setGoogleBusy(true);
     const r = await doGoogleSignIn();
     if (r.ok && !r.redirected) {
-      navigate({ to: "/" });
+      navigate({ to: "/dashboard" });
       return;
     }
     if (!r.ok) {
@@ -570,7 +570,7 @@ function SignupForm({ active }: { active: boolean }) {
         console.warn("Could not send verification email", verr);
       }
       // Brief pause so the user sees the verification message before redirect
-      setTimeout(() => navigate({ to: "/" }), 1200);
+      setTimeout(() => navigate({ to: "/dashboard" }), 1200);
     } catch (err: any) {
       setError(humanizeAuthError(err?.code, "Sign up failed."));
     } finally {
@@ -584,7 +584,7 @@ function SignupForm({ active }: { active: boolean }) {
     setGoogleBusy(true);
     const r = await doGoogleSignIn();
     if (r.ok && !r.redirected) {
-      navigate({ to: "/" });
+      navigate({ to: "/dashboard" });
       return;
     }
     if (!r.ok) {
