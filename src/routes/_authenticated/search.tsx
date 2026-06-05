@@ -722,7 +722,7 @@ function LeadCard({
 
   return (
     <div
-      className="group relative rounded-2xl p-4 sm:p-5 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
+      className="group relative rounded-2xl p-3 sm:p-5 transition-all duration-300 hover:-translate-y-0.5"
       style={{
         background: "var(--gradient-card)",
         border: `1px solid ${isNew ? "color-mix(in oklab, var(--primary) 50%, transparent)" : "color-mix(in oklab, var(--foreground) 8%, transparent)"}`,
@@ -735,9 +735,9 @@ function LeadCard({
           style={{ background: "var(--gradient-primary)" }}
         />
       )}
-      <div className="flex flex-col gap-3 sm:gap-4">
+      <div className="flex flex-col gap-3">
         {/* Header with info */}
-        <div className="flex gap-3 sm:gap-4 min-w-0">
+        <div className="flex gap-2 sm:gap-4">
           <div
             className="hidden sm:grid w-12 h-12 rounded-xl place-items-center text-sm font-bold text-primary-foreground shrink-0"
             style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-soft)" }}
@@ -745,11 +745,11 @@ function LeadCard({
             {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-display text-lg sm:text-xl text-foreground truncate">{lead.name}</h3>
+            <div className="flex items-start gap-2 flex-wrap">
+              <h3 className="font-display text-base sm:text-xl text-foreground">{lead.name}</h3>
               {isNew ? (
                 <Badge
-                  className="text-[10px] uppercase tracking-wider border-0 shrink-0"
+                  className="text-[10px] uppercase tracking-wider border-0 whitespace-nowrap"
                   style={{ background: "var(--gradient-primary)" }}
                 >
                   <Sparkles className="w-3 h-3 mr-1" /> New
@@ -757,7 +757,7 @@ function LeadCard({
               ) : (
                 <Badge
                   variant="secondary"
-                  className="text-[10px] uppercase tracking-wider shrink-0"
+                  className="text-[10px] uppercase tracking-wider whitespace-nowrap"
                   title={
                     firstSeenAt
                       ? `First seen ${new Date(firstSeenAt).toLocaleDateString()}`
@@ -768,52 +768,52 @@ function LeadCard({
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-2 sm:gap-3 mt-1.5 text-xs sm:text-sm text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-2 mt-1 text-xs sm:text-sm text-muted-foreground flex-wrap">
               {lead.rating !== null && (
-                <span className="inline-flex items-center gap-1 shrink-0">
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
                   <Star className="w-3.5 h-3.5 fill-accent text-accent" />
                   <span className="font-medium text-foreground">{lead.rating.toFixed(1)}</span>
                   <span className="text-xs">({lead.userRatingCount ?? 0})</span>
                 </span>
               )}
               {primaryType && (
-                <span className="text-xs px-2 py-0.5 rounded-md border border-border/60 bg-background/40 truncate">
+                <span className="text-xs px-2 py-0.5 rounded-md border border-border/60 bg-background/40">
                   {formatType(primaryType)}
                 </span>
               )}
             </div>
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 line-clamp-2">{lead.address}</p>
-            <div className="flex items-center gap-2 sm:gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">{lead.address}</p>
+            <div className="flex items-center gap-2 mt-1.5 text-xs text-muted-foreground flex-wrap">
               {lead.phone ? (
-                <span className="inline-flex items-center gap-1 truncate">
-                  <Phone className="w-3 h-3 shrink-0" />
-                  <span className="tabular-nums truncate">{lead.phone}</span>
+                <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                  <Phone className="w-3 h-3" />
+                  <span className="tabular-nums">{lead.phone}</span>
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 opacity-60">
                   <Phone className="w-3 h-3" />
-                  <span className="hidden sm:inline">no phone listed</span>
+                  no phone listed
                 </span>
               )}
               <a
                 href={lead.mapsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 hover:text-foreground transition-colors shrink-0"
+                className="inline-flex items-center gap-1 hover:text-foreground transition-colors whitespace-nowrap"
               >
                 <Globe2 className="w-3 h-3" />
-                <span className="hidden sm:inline">View on Maps</span>
+                View Maps
               </a>
             </div>
           </div>
         </div>
 
-        {/* Action buttons - Beautiful grid layout */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5 pt-2 sm:pt-2 border-t border-border/20">
+        {/* Action buttons */}
+        <div className="flex flex-col gap-2 pt-2 border-t border-border/20">
           {/* WhatsApp Button */}
           <Button
             asChild={!!lead.phone}
-            className="flex-1 h-9 sm:h-10 border-0 font-semibold transition-all text-sm"
+            className="w-full border-0 font-semibold transition-all text-xs sm:text-sm h-9 sm:h-10"
             style={{
               background: lead.phone
                 ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
@@ -827,52 +827,55 @@ function LeadCard({
                 href={wa}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-1 sm:gap-2"
+                className="flex items-center justify-center gap-2 w-full"
               >
-                <MessageCircle className="w-4 h-4 shrink-0" />
-                <span className="hidden sm:inline">WhatsApp</span>
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp</span>
               </a>
             ) : (
-              <span className="flex items-center justify-center gap-1 sm:gap-2">
-                <MessageCircle className="w-4 h-4 shrink-0" />
-                <span className="hidden sm:inline">No phone</span>
+              <span className="flex items-center justify-center gap-2 w-full">
+                <MessageCircle className="w-4 h-4" />
+                <span>No phone</span>
               </span>
             )}
           </Button>
 
-          {/* Phone Call Button */}
-          {lead.phone && (
+          {/* Phone + Email + Save Row */}
+          <div className="grid grid-cols-3 gap-2">
+            {/* Phone Call Button */}
+            {lead.phone && (
+              <a
+                href={`tel:${lead.phone}`}
+                className="rounded-lg border border-border/60 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold transition-all flex items-center justify-center gap-1 text-xs h-9 sm:h-10"
+                title="Call this business"
+              >
+                <Phone className="w-4 h-4" />
+                <span className="hidden sm:inline">Call</span>
+              </a>
+            )}
+
+            {/* Email Button */}
             <a
-              href={`tel:${lead.phone}`}
-              className="flex-1 h-9 sm:h-10 rounded-lg border border-border/60 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold transition-all flex items-center justify-center gap-1 sm:gap-2 text-sm shrink-0"
-              title="Call this business"
+              href={`mailto:?subject=${encodeURIComponent(`Your ${lead.name} Website`)}&body=${encodeURIComponent(`Hi ${lead.name},\n\nI noticed you don't have a website yet...`)}`}
+              className="rounded-lg border border-border/60 bg-purple-50 hover:bg-purple-100 text-purple-600 font-semibold transition-all flex items-center justify-center gap-1 text-xs h-9 sm:h-10"
+              title="Send email"
             >
-              <Phone className="w-4 h-4 shrink-0" />
-              <span className="hidden sm:inline">Call</span>
+              <Mail className="w-4 h-4" />
+              <span className="hidden sm:inline">Email</span>
             </a>
-          )}
 
-          {/* Email Button */}
-          <a
-            href={`mailto:?subject=${encodeURIComponent(`Your ${lead.name} Website`)}&body=${encodeURIComponent(`Hi ${lead.name},\n\nI noticed you don't have a website yet...`)}`}
-            className="flex-1 h-9 sm:h-10 rounded-lg border border-border/60 bg-purple-50 hover:bg-purple-100 text-purple-600 font-semibold transition-all flex items-center justify-center gap-1 sm:gap-2 text-sm"
-            title="Send email"
-          >
-            <Mail className="w-4 h-4 shrink-0" />
-            <span className="hidden sm:inline">Email</span>
-          </a>
-
-          {/* Save to CRM Button */}
-          <div className="relative flex-1">
-            <Button
-              onClick={handleSaveToCRM}
-              className="w-full h-9 sm:h-10 border border-border/60 bg-amber-50 hover:bg-amber-100 text-amber-600 font-semibold transition-all text-sm"
-              disabled={saveMsg.includes("Saving")}
-            >
-              <Save className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
-              <span className="hidden sm:inline">{saveMsg || "Save"}</span>
-              <span className="sm:hidden">{saveMsg ? "..." : "Save"}</span>
-            </Button>
+            {/* Save to CRM Button */}
+            <div className="relative">
+              <Button
+                onClick={handleSaveToCRM}
+                className="w-full border border-border/60 bg-amber-50 hover:bg-amber-100 text-amber-600 font-semibold transition-all text-xs h-9 sm:h-10"
+                disabled={saveMsg.includes("Saving")}
+              >
+                <Save className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">{saveMsg || "Save"}</span>
+                <span className="sm:hidden">{saveMsg ? "..." : "Save"}</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
