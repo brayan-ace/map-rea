@@ -110,7 +110,7 @@ function SearchPage() {
   const [keyword, setKeyword] = useState("");
   const [radius, setRadius] = useState(10);
   const [minRating, setMinRating] = useState(0);
-  const [hasPhone, setHasPhone] = useState(false);
+  const [hasPhone, setHasPhone] = useState(true);
   const [businessTypes, setBusinessTypes] = useState<string[]>([]);
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -259,7 +259,7 @@ function SearchPage() {
   return (
     <div className="px-5 sm:px-8 lg:px-12 py-8 lg:py-12 max-w-[1400px] mx-auto pb-24">
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-8" style={{ animation: "none" }}>
         <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Search</p>
         <h1 className="mt-2 font-display text-[2.25rem] sm:text-5xl text-foreground leading-[0.95]">
           Scan a city for <span className="italic text-gradient">website-less businesses.</span>
@@ -367,7 +367,7 @@ function SearchPage() {
                   onChange={(e) => setHasPhone(e.target.checked)}
                   className="h-4 w-4 text-primary"
                 />
-                <span className="text-sm font-medium">Only show businesses with phone numbers</span>
+                <span className="text-sm font-medium">Only show businesses with phone numbers (enabled by default)</span>
               </div>
             </div>
 
@@ -382,16 +382,16 @@ function SearchPage() {
             <Slider
               value={[radius]}
               min={1}
-              max={100}
+              max={50}
               step={1}
               onValueChange={(v) => setRadius(v[0] ?? 10)}
             />
             <div className="flex justify-between text-[10px] text-muted-foreground/70 tabular-nums">
               <span>1km</span>
+              <span>12.5</span>
               <span>25</span>
-              <span>50</span>
-              <span>75</span>
-              <span>100km</span>
+              <span>37.5</span>
+              <span>50km</span>
             </div>
           </div>
 
@@ -722,7 +722,7 @@ function LeadCard({
 
   return (
     <div
-      className="group relative rounded-2xl p-5 transition-all duration-300 hover:-translate-y-0.5"
+      className="group relative rounded-2xl p-4 sm:p-5 transition-all duration-300 hover:-translate-y-0.5 overflow-hidden"
       style={{
         background: "var(--gradient-card)",
         border: `1px solid ${isNew ? "color-mix(in oklab, var(--primary) 50%, transparent)" : "color-mix(in oklab, var(--foreground) 8%, transparent)"}`,
@@ -735,9 +735,9 @@ function LeadCard({
           style={{ background: "var(--gradient-primary)" }}
         />
       )}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
         {/* Header with info */}
-        <div className="flex gap-4">
+        <div className="flex gap-3 sm:gap-4 min-w-0">
           <div
             className="hidden sm:grid w-12 h-12 rounded-xl place-items-center text-sm font-bold text-primary-foreground shrink-0"
             style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-soft)" }}
@@ -746,10 +746,10 @@ function LeadCard({
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-display text-xl text-foreground truncate">{lead.name}</h3>
+              <h3 className="font-display text-lg sm:text-xl text-foreground truncate">{lead.name}</h3>
               {isNew ? (
                 <Badge
-                  className="text-[10px] uppercase tracking-wider border-0"
+                  className="text-[10px] uppercase tracking-wider border-0 shrink-0"
                   style={{ background: "var(--gradient-primary)" }}
                 >
                   <Sparkles className="w-3 h-3 mr-1" /> New
@@ -757,7 +757,7 @@ function LeadCard({
               ) : (
                 <Badge
                   variant="secondary"
-                  className="text-[10px] uppercase tracking-wider"
+                  className="text-[10px] uppercase tracking-wider shrink-0"
                   title={
                     firstSeenAt
                       ? `First seen ${new Date(firstSeenAt).toLocaleDateString()}`
@@ -768,52 +768,52 @@ function LeadCard({
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-3 mt-1.5 text-sm text-muted-foreground flex-wrap">
+            <div className="flex items-center gap-2 sm:gap-3 mt-1.5 text-xs sm:text-sm text-muted-foreground flex-wrap">
               {lead.rating !== null && (
-                <span className="inline-flex items-center gap-1">
+                <span className="inline-flex items-center gap-1 shrink-0">
                   <Star className="w-3.5 h-3.5 fill-accent text-accent" />
                   <span className="font-medium text-foreground">{lead.rating.toFixed(1)}</span>
                   <span className="text-xs">({lead.userRatingCount ?? 0})</span>
                 </span>
               )}
               {primaryType && (
-                <span className="text-xs px-2 py-0.5 rounded-md border border-border/60 bg-background/40">
+                <span className="text-xs px-2 py-0.5 rounded-md border border-border/60 bg-background/40 truncate">
                   {formatType(primaryType)}
                 </span>
               )}
             </div>
-            <p className="text-sm text-muted-foreground mt-1.5">{lead.address}</p>
-            <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 line-clamp-2">{lead.address}</p>
+            <div className="flex items-center gap-2 sm:gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
               {lead.phone ? (
-                <span className="inline-flex items-center gap-1">
-                  <Phone className="w-3 h-3" />
-                  <span className="tabular-nums">{lead.phone}</span>
+                <span className="inline-flex items-center gap-1 truncate">
+                  <Phone className="w-3 h-3 shrink-0" />
+                  <span className="tabular-nums truncate">{lead.phone}</span>
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-1 opacity-60">
                   <Phone className="w-3 h-3" />
-                  no phone listed
+                  <span className="hidden sm:inline">no phone listed</span>
                 </span>
               )}
               <a
                 href={lead.mapsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 hover:text-foreground transition-colors"
+                className="inline-flex items-center gap-1 hover:text-foreground transition-colors shrink-0"
               >
                 <Globe2 className="w-3 h-3" />
-                View on Maps
+                <span className="hidden sm:inline">View on Maps</span>
               </a>
             </div>
           </div>
         </div>
 
         {/* Action buttons - Beautiful grid layout */}
-        <div className="flex flex-col sm:flex-row gap-2.5 pt-2 border-t border-border/20">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-2.5 pt-2 sm:pt-2 border-t border-border/20">
           {/* WhatsApp Button */}
           <Button
             asChild={!!lead.phone}
-            className="flex-1 h-10 border-0 font-semibold transition-all"
+            className="flex-1 h-9 sm:h-10 border-0 font-semibold transition-all text-sm"
             style={{
               background: lead.phone
                 ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
@@ -827,15 +827,15 @@ function LeadCard({
                 href={wa}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center justify-center gap-2"
+                className="flex items-center justify-center gap-1 sm:gap-2"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>WhatsApp</span>
+                <MessageCircle className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline">WhatsApp</span>
               </a>
             ) : (
-              <span className="flex items-center justify-center gap-2">
-                <MessageCircle className="w-4 h-4" />
-                <span>No phone</span>
+              <span className="flex items-center justify-center gap-1 sm:gap-2">
+                <MessageCircle className="w-4 h-4 shrink-0" />
+                <span className="hidden sm:inline">No phone</span>
               </span>
             )}
           </Button>
@@ -844,33 +844,34 @@ function LeadCard({
           {lead.phone && (
             <a
               href={`tel:${lead.phone}`}
-              className="flex-1 h-10 rounded-lg border border-border/60 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold transition-all flex items-center justify-center gap-2"
+              className="flex-1 h-9 sm:h-10 rounded-lg border border-border/60 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold transition-all flex items-center justify-center gap-1 sm:gap-2 text-sm shrink-0"
               title="Call this business"
             >
-              <Phone className="w-4 h-4" />
-              <span>Call</span>
+              <Phone className="w-4 h-4 shrink-0" />
+              <span className="hidden sm:inline">Call</span>
             </a>
           )}
 
           {/* Email Button */}
           <a
             href={`mailto:?subject=${encodeURIComponent(`Your ${lead.name} Website`)}&body=${encodeURIComponent(`Hi ${lead.name},\n\nI noticed you don't have a website yet...`)}`}
-            className="flex-1 h-10 rounded-lg border border-border/60 bg-purple-50 hover:bg-purple-100 text-purple-600 font-semibold transition-all flex items-center justify-center gap-2"
+            className="flex-1 h-9 sm:h-10 rounded-lg border border-border/60 bg-purple-50 hover:bg-purple-100 text-purple-600 font-semibold transition-all flex items-center justify-center gap-1 sm:gap-2 text-sm"
             title="Send email"
           >
-            <Mail className="w-4 h-4" />
-            <span>Email</span>
+            <Mail className="w-4 h-4 shrink-0" />
+            <span className="hidden sm:inline">Email</span>
           </a>
 
           {/* Save to CRM Button */}
           <div className="relative flex-1">
             <Button
               onClick={handleSaveToCRM}
-              className="w-full h-10 border border-border/60 bg-amber-50 hover:bg-amber-100 text-amber-600 font-semibold transition-all"
+              className="w-full h-9 sm:h-10 border border-border/60 bg-amber-50 hover:bg-amber-100 text-amber-600 font-semibold transition-all text-sm"
               disabled={saveMsg.includes("Saving")}
             >
-              <Save className="w-4 h-4 mr-2" />
-              {saveMsg || "Save"}
+              <Save className="w-4 h-4 mr-1 sm:mr-2 shrink-0" />
+              <span className="hidden sm:inline">{saveMsg || "Save"}</span>
+              <span className="sm:hidden">{saveMsg ? "..." : "Save"}</span>
             </Button>
           </div>
         </div>
