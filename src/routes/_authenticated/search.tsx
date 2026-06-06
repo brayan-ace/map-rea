@@ -18,6 +18,9 @@ import {
   fetchSearchHistory,
   saveCRMLead,
   type CRMLead,
+  getUserSearchLimit,
+  initializeUserSearchLimit,
+  decrementSearchCount,
 } from "@/lib/user-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -118,6 +121,7 @@ function SearchPage() {
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [seenSnapshot, setSeenSnapshot] = useState<Record<string, number>>({});
+  const [searchesRemaining, setSearchesRemaining] = useState(3);
 
   // Hydrate from query param
   useEffect(() => {
@@ -134,6 +138,16 @@ function SearchPage() {
     if (!user) return;
     setSavedSearches(loadSavedCache(user.uid));
     setSearchHistory(loadHistoryCache(user.uid));
+    
+    // Initialize search limit if not already set
+    initializeUserSearchLimit(user.uid)
+      .catch(() => {});
+    
+    // Fetch current search limit
+    getUserSearchLimit(user.uid)
+      .then(setSearchesRemaining)
+      .catch(() => setSearchesRemaining(3));
+    
     fetchSavedSearches(user.uid)
       .then(setSavedSearches)
       .catch(() => {});
@@ -154,6 +168,13 @@ function SearchPage() {
       saveSeen(next);
       setSeen(next);
       if (!user) return;
+
+      // Decrement search count
+      decrementSearchCount(user.uid)
+        .then(setSearchesRemaining)
+        .catch((err) => {
+          console.error("Failed to decrement search count:", err);
+        });
 
       // Auto-save to search history
       const historyEntry: SearchHistory = {
@@ -197,6 +218,10 @@ function SearchPage() {
 
   const runSearch = () => {
     if (!location.trim()) return;
+    if (searchesRemaining <= 0) {
+      alert("You've used all your free searches. Please upgrade your account or contact support.");
+      return;
+    }
     setSeenSnapshot(loadSeen());
     mutation.mutate();
   };
@@ -425,11 +450,25 @@ function SearchPage() {
             )}
           </div>
 
+          {searchesRemaining <= 0 && (
+            <div className="md:col-span-2 rounded-2xl p-4 border border-destructive/40 bg-destructive/10">
+              <p className="text-sm text-destructive-foreground">
+                You've used all your free searches. Please upgrade your account to continue searching.
+              </p>
+            </div>
+          )}
+
+          {searchesRemaining > 0 && (
+            <div className="md:col-span-2 text-xs text-muted-foreground">
+              <span className="font-semibold text-foreground">{searchesRemaining}</span> free {searchesRemaining === 1 ? "search" : "searches"} remaining
+            </div>
+          )}
+
           <div className="md:col-span-2 flex flex-col sm:flex-row gap-2.5 pt-2">
             <Button
               type="submit"
               size="lg"
-              disabled={mutation.isPending || !location.trim()}
+              disabled={mutation.isPending || !location.trim() || searchesRemaining <= 0}
               className="flex-1 h-12 text-base font-semibold border-0 transition-transform hover:scale-[1.01]"
               style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
             >
@@ -450,7 +489,7 @@ function SearchPage() {
               size="lg"
               variant="outline"
               onClick={runSearch}
-              disabled={mutation.isPending || !location.trim()}
+              disabled={mutation.isPending || !location.trim() || searchesRemaining <= 0}
               className="h-12 bg-background/40 border-border/60 hover:bg-background/60"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${mutation.isPending ? "animate-spin" : ""}`} />

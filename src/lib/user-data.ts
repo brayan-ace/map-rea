@@ -530,3 +530,44 @@ export async function getCRMLeadStats(uid: string): Promise<{
 
   return stats;
 }
+
+// ---- Search Limits ----
+
+export async function getUserSearchLimit(uid: string): Promise<number> {
+  try {
+    const snap = await getDoc(userDocRef(uid));
+    if (!snap.exists()) return 3; // Default to 3 free searches
+    return snap.data().searchesRemaining ?? 3;
+  } catch {
+    return 3;
+  }
+}
+
+export async function initializeUserSearchLimit(uid: string, limit: number = 3): Promise<void> {
+  try {
+    const snap = await getDoc(userDocRef(uid));
+    // Only initialize if user doc doesn't exist or searchesRemaining is not set
+    if (!snap.exists() || snap.data().searchesRemaining === undefined) {
+      await updateDoc(userDocRef(uid), { searchesRemaining: limit });
+    }
+  } catch {
+    // If doc doesn't exist, create it
+    await setDoc(userDocRef(uid), { searchesRemaining: limit }, { merge: true });
+  }
+}
+
+export async function decrementSearchCount(uid: string): Promise<number> {
+  try {
+    const current = await getUserSearchLimit(uid);
+    const newCount = Math.max(0, current - 1);
+    await updateDoc(userDocRef(uid), { searchesRemaining: newCount });
+    return newCount;
+  } catch (err) {
+    console.error("Failed to decrement search count:", err);
+    throw err;
+  }
+}
+
+export async function setUserSearchLimit(uid: string, limit: number): Promise<void> {
+  await updateDoc(userDocRef(uid), { searchesRemaining: limit });
+}
