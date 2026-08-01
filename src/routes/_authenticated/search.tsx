@@ -60,23 +60,59 @@ export const Route = createFileRoute("/_authenticated/search")({
   }),
 });
 
-const DEFAULT_MESSAGE = `Hi, I'm Jordan 👋
+const DEFAULT_MESSAGE = `Hello Mr/Mrs, I'm Jordan, founder of a local web agency. We're currently reaching out to businesses without a website as part of an outreach promotion — and we'd love to help *{business_name}* build a stronger online presence.
 
-I came across [Business Name] online and noticed you don't have a website yet.
+If this interests you, I can build you a free demo first, no obligation, so you can see exactly what we'd deliver before any commitment.
 
-Having one would:
+Reply and I'll get started on your demo today.
 
-✅ Make new customers trust you instantly before they even call
+NB: This promotion includes a discounted rate for a limited time.`;
 
-✅ Keep your business working 24/7 even when you're closed
+const DEFAULT_TRANSLATION_TARGET = "fr";
+const WHATSAPP_MESSAGE_VARIANTS = [
+  `Hello Mr/Mrs, I'm Jordan, founder of a local web agency. We're currently reaching out to businesses without a website as part of an outreach promotion — and we'd love to help *{business_name}* build a stronger online presence.
 
-I actually went ahead and built one for you already.
+If this interests you, I can build you a free demo first, no obligation, so you can see exactly what we'd deliver before any commitment.
 
-If you can give me 5 minutes, I'd love to show you what it looks like.
+Reply and I'll get started on your demo today.
 
-If you like it — great, we can talk.
+NB: This promotion includes a discounted rate for a limited time.`,
+  `Hello there, I'm Jordan, founder of a local web agency. We're currently reaching out to businesses without a website as part of an outreach promotion — and we'd love to help *{business_name}* build a stronger online presence.
 
-If you don't — no hard feelings, you'll never hear from me again. 🤝`;
+If this interests you, I can build you a free demo first, no obligation, so you can see exactly what we'd deliver before any commitment.
+
+Reply and I'll get started on your demo today.
+
+NB: This promotion includes a discounted rate for a limited time.`,
+  `Hi there, I'm Jordan, founder of a local web agency. We're currently reaching out to businesses without a website as part of an outreach promotion — and we'd love to help *{business_name}* build a stronger online presence.
+
+If this interests you, I can build you a free demo first, no obligation, so you can see exactly what we'd deliver before any commitment.
+
+Reply and I'll get started on your demo today.
+
+NB: This promotion includes a discounted rate for a limited time.`,
+  `Good day, I'm Jordan, founder of a local web agency. We're currently reaching out to businesses without a website as part of an outreach promotion — and we'd love to help *{business_name}* build a stronger online presence.
+
+If this interests you, I can build you a free demo first, no obligation, so you can see exactly what we'd deliver before any commitment.
+
+Reply and I'll get started on your demo today.
+
+NB: This promotion includes a discounted rate for a limited time.`,
+  `Hello, I'm Jordan, founder of a local web agency. We're currently reaching out to businesses without a website as part of an outreach promotion — and we'd love to help *{business_name}* build a stronger online presence.
+
+If this interests you, I can build you a free demo first, no obligation, so you can see exactly what we'd deliver before any commitment.
+
+Reply and I'll get started on your demo today.
+
+NB: This promotion includes a discounted rate for a limited time.`,
+  `Hi, I'm Jordan, founder of a local web agency. We're currently reaching out to businesses without a website as part of an outreach promotion — and we'd love to help *{business_name}* build a stronger online presence.
+
+If this interests you, I can build you a free demo first, no obligation, so you can see exactly what we'd deliver before any commitment.
+
+Reply and I'll get started on your demo today.
+
+NB: This promotion includes a discounted rate for a limited time.`,
+];
 
 const SEEN_KEY = "leadfinder.seen.v1";
 
@@ -92,16 +128,36 @@ function saveSeen(seen: Record<string, number>) {
   localStorage.setItem(SEEN_KEY, JSON.stringify(seen));
 }
 
+function buildWhatsAppMessage(businessName: string, template: string) {
+  return template.replaceAll("{business_name}", businessName).replaceAll("[Business Name]", businessName);
+}
+
+async function translateText(text: string, targetLanguage: string) {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(text)}`;
+  const res = await fetch(url);
+  const json = (await res.json()) as Array<Array<string>>;
+  return json?.[0]?.map((entry) => entry?.[0] ?? "").join("") ?? text;
+}
+
 function buildWhatsAppLink(phone: string | null, businessName: string, template: string) {
-  const text = template
-    .replaceAll("[Business Name]", businessName)
-    .replaceAll("{business}", businessName);
+  const text = buildWhatsAppMessage(businessName, template);
   const encoded = encodeURIComponent(text);
   if (phone) {
     const digits = phone.replace(/[^\d]/g, "");
     return `https://wa.me/${digits}?text=${encoded}`;
   }
   return `https://wa.me/?text=${encoded}`;
+}
+
+function pickNextVariant(previousVariantIndex: number | null, totalVariants: number) {
+  if (totalVariants <= 1) return 0;
+
+  let nextVariantIndex = Math.floor(Math.random() * totalVariants);
+  while (nextVariantIndex === previousVariantIndex) {
+    nextVariantIndex = Math.floor(Math.random() * totalVariants);
+  }
+
+  return nextVariantIndex;
 }
 
 function SearchPage() {
@@ -116,7 +172,10 @@ function SearchPage() {
   const [hasPhone, setHasPhone] = useState(true);
   const [businessTypes, setBusinessTypes] = useState<string[]>([]);
   const [message, setMessage] = useState(DEFAULT_MESSAGE);
+  const [translatedVariants, setTranslatedVariants] = useState<string[]>(WHATSAPP_MESSAGE_VARIANTS);
+  const [translationTarget, setTranslationTarget] = useState(DEFAULT_TRANSLATION_TARGET);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [seen, setSeen] = useState<Record<string, number>>({});
   const [savedSearches, setSavedSearches] = useState<SavedSearch[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
@@ -237,6 +296,23 @@ function SearchPage() {
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     runSearch();
+  };
+
+  const handleTranslateMessage = async () => {
+    if (!message.trim()) return;
+    setIsTranslating(true);
+
+    try {
+      const translated = await Promise.all(
+        WHATSAPP_MESSAGE_VARIANTS.map((variant) => translateText(variant, translationTarget)),
+      );
+      setTranslatedVariants(translated);
+      setMessage(translated[0] ?? message);
+    } catch {
+      setMessage(DEFAULT_MESSAGE);
+    } finally {
+      setIsTranslating(false);
+    }
   };
 
   const saveCurrent = async () => {
@@ -433,12 +509,35 @@ function SearchPage() {
             </button>
             {showAdvanced && (
               <div className="mt-3 space-y-2 animate-rise">
-                <Textarea
-                  rows={8}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="bg-background/50 border-border/60 backdrop-blur focus-glow font-mono text-[13px] leading-relaxed"
-                />
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      value={translationTarget}
+                      onChange={(e) => setTranslationTarget(e.target.value)}
+                      className="h-9 rounded-lg border border-border/60 bg-background/50 px-3 text-xs text-foreground"
+                    >
+                      <option value="fr">French</option>
+                      <option value="es">Spanish</option>
+                      <option value="de">German</option>
+                    </select>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={handleTranslateMessage}
+                      disabled={isTranslating}
+                      className="h-9 bg-background/40 border-border/60"
+                    >
+                      {isTranslating ? "Translating..." : "Translate"}
+                    </Button>
+                  </div>
+                  <Textarea
+                    rows={8}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="bg-background/50 border-border/60 backdrop-blur focus-glow font-mono text-[13px] leading-relaxed"
+                  />
+                </div>
                 <p className="text-xs text-muted-foreground">
                   Use{" "}
                   <code className="text-accent px-1 py-0.5 rounded bg-accent/10">
@@ -535,6 +634,7 @@ function SearchPage() {
         <Results
           result={result}
           message={message}
+          variants={translatedVariants}
           previouslySeen={seenSnapshot}
           onRefresh={runSearch}
           refreshing={mutation.isPending}
@@ -547,17 +647,20 @@ function SearchPage() {
 function Results({
   result,
   message,
+  variants,
   previouslySeen,
   onRefresh,
   refreshing,
 }: {
   result: SearchResult;
   message: string;
+  variants: string[];
   previouslySeen: Record<string, number>;
   onRefresh: () => void;
   refreshing: boolean;
 }) {
   const { user } = useAuth();
+  const [lastVariantIndex, setLastVariantIndex] = useState<number | null>(null);
   const sorted = useMemo(() => {
     const list = [...result.leads];
     list.sort((a, b) => {
@@ -643,9 +746,12 @@ function Results({
               <LeadCard
                 lead={lead}
                 message={message}
+                variants={variants}
                 isNew={!previouslySeen[lead.id]}
                 firstSeenAt={previouslySeen[lead.id]}
                 userId={user?.uid}
+                lastVariantIndex={lastVariantIndex}
+                onVariantSelected={setLastVariantIndex}
               />
             </div>
           ))}
@@ -704,17 +810,22 @@ function formatType(t?: string) {
 function LeadCard({
   lead,
   message,
+  variants,
   isNew,
   firstSeenAt,
   userId,
+  lastVariantIndex,
+  onVariantSelected,
 }: {
   lead: Lead;
   message: string;
+  variants: string[];
   isNew: boolean;
   firstSeenAt?: number;
   userId?: string;
+  lastVariantIndex: number | null;
+  onVariantSelected: (variantIndex: number | null) => void;
 }) {
-  const wa = buildWhatsAppLink(lead.phone, lead.name, message);
   const initials = lead.name
     .split(/\s+/)
     .slice(0, 2)
@@ -757,6 +868,17 @@ function LeadCard({
       setSaveMsg("✗ Failed");
       setTimeout(() => setSaveMsg(""), 3000);
     }
+  };
+
+  const handleWhatsAppClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (!lead.phone) return;
+
+    const variantIndex = pickNextVariant(lastVariantIndex, variants.length);
+    const selectedMessage = buildWhatsAppMessage(lead.name, variants[variantIndex] ?? message);
+    const nextLink = buildWhatsAppLink(lead.phone, lead.name, selectedMessage);
+    onVariantSelected(variantIndex);
+    window.open(nextLink, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -851,7 +973,7 @@ function LeadCard({
         <div className="flex flex-col gap-2 pt-2 border-t border-border/20">
           {/* WhatsApp Button */}
           <Button
-            asChild={!!lead.phone}
+            onClick={handleWhatsAppClick}
             className="w-full border-0 font-semibold transition-all text-xs sm:text-sm h-9 sm:h-10"
             style={{
               background: lead.phone
@@ -862,15 +984,10 @@ function LeadCard({
             disabled={!lead.phone}
           >
             {lead.phone ? (
-              <a
-                href={wa}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 w-full"
-              >
+              <span className="flex items-center justify-center gap-2 w-full">
                 <MessageCircle className="w-4 h-4" />
                 <span>WhatsApp</span>
-              </a>
+              </span>
             ) : (
               <span className="flex items-center justify-center gap-2 w-full">
                 <MessageCircle className="w-4 h-4" />
